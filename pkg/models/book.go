@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/Double-DOS/go-bookstore/pkg/config"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 var db *gorm.DB
@@ -21,7 +21,7 @@ func init() {
 }
 
 func (b *Book) CreateBook() *Book {
-	db.NewRecord(b)
+	// db.NewRecord(b)
 	db.Create(b)
 	return b
 }
@@ -34,12 +34,19 @@ func GetAllBooks() []Book {
 
 func GetBookById(Id int64) (*Book, *gorm.DB) {
 	var getBook Book
-	db := db.Where("ID=?", Id).Find(&getBook)
+	db := db.First(&getBook, "ID=?", Id)
 	return &getBook, db
 }
 
 func DeleteBook(Id int64) Book {
 	var book Book
-	db.Where("ID=?", Id).Delete(book)
+	db.Delete(&book, Id)
+	return book
+}
+
+func UpdateBook(Id int64, data *Book) Book {
+	var book Book
+	db.Model(book).Where("ID = ?", Id).Updates(data)
+	db.First(&book, "ID=?", Id)
 	return book
 }
